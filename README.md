@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="Gafelsound.png" alt="GafelSound Logo" width="110" height="110" />
+  <img src="Gafelsound.png" alt="GafelSound Logo" width="220" height="220" />
   <h1>GafelSound</h1>
   <p><b>Modern Multi-Output Audio Manager for Windows</b></p>
   <p>Play system audio simultaneously across multiple playback devices (e.g., Desktop Speakers + Bluetooth Headphones) with independent volume control and a clean, modern UI.</p>
