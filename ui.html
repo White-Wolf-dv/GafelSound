@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GafelSound — Audio Manager</title>
+<style>
+:root{--bg:#f2f4f8;--panel:#fff;--panel2:#f8f9fc;--text:#202633;--muted:#778195;--line:#e5e9f0;--blue:#397af5;--blue-soft:#eaf1ff;--green:#239c72;--green-soft:#e8f7f0;--sidebar:#202631;--shadow:0 8px 28px rgba(27,39,58,.06)}
+*{box-sizing:border-box}body{margin:0;font-family:"Segoe UI",Inter,Arial,sans-serif;background:var(--bg);color:var(--text);transition:.2s;user-select:none}
+body.dark{--bg:#171a21;--panel:#242832;--panel2:#2b303b;--text:#f2f4f8;--muted:#a0a8b7;--line:#373d49;--blue-soft:#293a58;--green-soft:#263e37;--shadow:0 8px 28px rgba(0,0,0,.16)}
+.app{min-height:100vh;display:flex}.sidebar{width:224px;background:var(--sidebar);color:#fff;padding:24px 15px;display:flex;flex-direction:column;flex-shrink:0}
+.brand{display:flex;align-items:center;gap:11px;padding:0 9px 30px}.brand-icon{width:38px;height:38px;border-radius:12px;background:#397af5;display:grid;place-items:center;font-size:21px}.brand-name{font-weight:750;font-size:18px;letter-spacing:.2px}.brand-sub{font-size:9px;color:#9ca8b9;letter-spacing:1.5px;margin-top:3px}
+.nav-label{font-size:10px;color:#8290a3;font-weight:700;letter-spacing:1.3px;padding:0 10px 10px}.nav{display:flex;flex-direction:column;gap:5px}.nav button{border:0;background:transparent;color:#c2cad6;padding:12px 11px;border-radius:9px;text-align:left;font-size:13px;display:flex;align-items:center;gap:12px;cursor:pointer}.nav button:hover{background:#2b3543}.nav button.active{background:#35445b;color:#fff}.nav .ico{width:19px;text-align:center;font-size:16px}
+.sidebar-bottom{margin-top:auto;background:#2b3543;border-radius:12px;padding:13px}.engine{font-size:12px;font-weight:650;display:flex;align-items:center;gap:8px}.dot{width:7px;height:7px;border-radius:50%;background:#46d69a;display:inline-block}.engine-note{font-size:10px;color:#aeb9c8;margin:8px 0 0 15px}.version{font-size:9px;color:#8290a3;padding:17px 8px 0;letter-spacing:1px}
+main{flex:1;min-width:0;padding:30px 34px 40px;max-width:1500px;margin:0 auto;width:100%}.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}.eyebrow{font-size:11px;color:var(--muted);margin-bottom:5px}.page-title{font-size:25px;font-weight:750;letter-spacing:-.5px}.page-desc{font-size:12px;color:var(--muted);margin-top:5px}.top-actions{display:flex;gap:10px;align-items:center}.icon-btn{width:39px;height:39px;border:1px solid var(--line);border-radius:11px;background:var(--panel);color:var(--text);cursor:pointer;font-size:17px}.avatar{width:38px;height:38px;border-radius:50%;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-weight:700;font-size:12px}
+.page{display:none}.page.active{display:block}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-bottom:25px}.stat,.card,.section-panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow)}.stat{padding:17px 19px;display:flex;align-items:center;gap:14px}.stat-icon{width:42px;height:42px;border-radius:12px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-size:19px}.stat:nth-child(2) .stat-icon{background:var(--green-soft);color:var(--green)}.stat:nth-child(3) .stat-icon{background:#f3edff;color:#8861d8}.stat-value{font-size:23px;font-weight:750}.stat-label{font-size:11px;color:var(--muted);margin-top:3px}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin:24px 0 13px}.section-title{font-size:16px;font-weight:730}.section-hint{font-size:11px;color:var(--muted);margin-top:4px}.link-btn{border:0;background:transparent;color:var(--blue);font-size:11px;font-weight:700;letter-spacing:.3px;cursor:pointer}
+.device-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.device-card{padding:18px;transition:.2s}.device-top{display:flex;align-items:center;gap:12px}.device-icon{width:43px;height:43px;border-radius:12px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-size:21px}.device-card:nth-child(2n) .device-icon{background:var(--green-soft);color:var(--green)}.device-card:nth-child(3n) .device-icon{background:#f3edff;color:#8861d8}.device-name{font-size:13px;font-weight:700}.device-desc{font-size:10px;color:var(--muted);margin-top:4px}.spacer{flex:1}.pill{font-size:10px;font-weight:650;padding:5px 9px;border-radius:20px;background:var(--green-soft);color:var(--green)}.pill.off{background:var(--panel2);color:var(--muted)}.volume-row{display:flex;align-items:center;justify-content:space-between;margin:20px 0 9px;font-size:11px;color:var(--muted)}.volume-value{font-size:13px;font-weight:750;color:var(--text);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;height:5px;appearance:none;background:linear-gradient(to right,var(--blue) 0%,var(--blue) var(--fill,50%),var(--line) var(--fill,50%),var(--line) 100%);border-radius:8px;outline:none;cursor:pointer}input[type=range]::-webkit-slider-thumb{appearance:none;width:15px;height:15px;border-radius:50%;background:var(--blue);border:3px solid var(--panel);box-shadow:0 0 0 1px var(--blue)}
+.card-footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);margin-top:17px;padding-top:13px}.check-label{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;cursor:pointer}.check-label input{accent-color:var(--blue);width:15px;height:15px}.mute-btn{border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:8px;padding:6px 9px;font-size:10px;cursor:pointer}.mute-btn.active{color:#d45b5b;border-color:#e9bcbc;background:#fff2f2}
+.routing-list{padding:4px 17px}.route-row{display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid var(--line)}.route-row:last-child{border-bottom:0}.app-icon{width:34px;height:34px;border-radius:10px;background:var(--panel2);display:grid;place-items:center;font-size:16px}.app-name{font-size:12px;font-weight:700}.app-meta{font-size:10px;color:var(--muted);margin-top:3px}.route-select{border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:var(--text);padding:8px 10px;font:inherit;font-size:11px;min-width:165px}
+.modebar{display:flex;gap:8px;background:var(--panel2);padding:5px;border:1px solid var(--line);border-radius:11px;width:max-content;margin-bottom:17px}.modebar button{border:0;background:transparent;padding:8px 13px;border-radius:8px;color:var(--muted);font-size:11px;cursor:pointer}.modebar button.active{background:var(--panel);color:var(--blue);font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.device-table{width:100%;border-collapse:collapse;font-size:11px}.device-table th{text-align:left;color:var(--muted);font-weight:600;padding:12px;border-bottom:1px solid var(--line)}.device-table td{padding:15px 12px;border-bottom:1px solid var(--line)}.device-table tr:last-child td{border:0}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.setting-card{padding:19px}.setting-title{font-size:13px;font-weight:700;margin-bottom:5px}.setting-desc{font-size:11px;color:var(--muted);margin-bottom:16px}.theme-options{display:flex;gap:9px}.theme-option{flex:1;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:12px;border-radius:10px;cursor:pointer;font-size:11px}.theme-option.selected{border-color:var(--blue);color:var(--blue);background:var(--blue-soft)}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-top:1px solid var(--line);font-size:11px}.switch{position:relative;width:34px;height:19px;display:inline-block}.switch input{opacity:0;width:0;height:0}.switch span{position:absolute;inset:0;background:#bbc2ce;border-radius:20px;cursor:pointer;transition:.2s}.switch span:before{content:"";position:absolute;width:13px;height:13px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}.switch input:checked+span{background:var(--blue)}.switch input:checked+span:before{transform:translateX(15px)}
+.primary-btn{border:0;background:var(--blue);color:#fff;padding:10px 14px;border-radius:9px;font-weight:650;font-size:11px;cursor:pointer}.secondary-btn{border:1px solid var(--line);background:var(--panel);color:var(--text);padding:9px 13px;border-radius:9px;font-size:11px;cursor:pointer}
+.notice{margin-top:15px;background:var(--blue-soft);color:var(--muted);padding:12px 14px;border-radius:10px;font-size:10px;line-height:1.6}
+.toast{position:fixed;bottom:22px;right:22px;background:#202631;color:white;padding:12px 16px;border-radius:10px;font-size:12px;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;z-index:100}.toast.show{opacity:1;transform:translateY(0)}
+@media(max-width:850px){.sidebar{width:68px;padding:20px 9px}.brand{padding:0 5px 30px}.brand-name,.brand-sub,.nav-label,.nav-text,.engine-note,.version{display:none}.brand-icon{flex-shrink:0}.nav button{justify-content:center;padding:12px 5px}.sidebar-bottom{padding:12px 8px}.engine{justify-content:center;font-size:0}.engine .dot{width:9px;height:9px}.stats{grid-template-columns:1fr 1fr}.device-grid{grid-template-columns:1fr}main{padding:23px 18px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><div class="brand-icon">≋</div><div><div class="brand-name">GafelSound</div><div class="brand-sub">AUDIO MANAGER</div></div></div>
+  <div class="nav-label">WORKSPACE</div>
+  <nav class="nav">
+    <button class="active" data-page="dashboard"><span class="ico">▦</span><span class="nav-text">Dashboard</span></button>
+    <button data-page="routing"><span class="ico">⇄</span><span class="nav-text">App Routing</span></button>
+    <button data-page="devices"><span class="ico">♬</span><span class="nav-text">Devices</span></button>
+    <button data-page="settings"><span class="ico">⚙</span><span class="nav-text">Settings</span></button>
+  </nav>
+  <div class="sidebar-bottom"><div class="engine"><span class="dot" id="engineDot"></span> Audio Engine</div><div class="engine-note" id="engineNote">WASAPI Multi-Output Active</div></div>
+  <div class="version">VERSION 1.0 FULL</div>
+</aside>
+<main>
+  <header class="topbar">
+    <div><div class="eyebrow">AUDIO WORKSPACE / <span id="crumb">OVERVIEW</span></div><div class="page-title" id="pageTitle">Dashboard</div><div class="page-desc" id="pageDesc">Manage your audio experience</div></div>
+    <div class="top-actions"><button class="icon-btn" id="themeQuick" title="Toggle theme">☾</button><button class="icon-btn" id="openWinMixer" title="Windows Sound Mixer">♧</button><div class="avatar">AF</div></div>
+  </header>
+
+  <section class="page active" id="page-dashboard">
+    <div class="stats">
+      <div class="stat"><div class="stat-icon">♬</div><div><div class="stat-value" id="connectedCount">0</div><div class="stat-label">Connected devices</div></div></div>
+      <div class="stat"><div class="stat-icon">◉</div><div><div class="stat-value" id="activeCount">0</div><div class="stat-label">Active outputs</div></div></div>
+      <div class="stat"><div class="stat-icon">〽</div><div><div class="stat-value" id="engineStatusText">Active</div><div class="stat-label">Audio engine status</div></div></div>
+    </div>
+    <div class="section-head"><div><div class="section-title">Audio Outputs</div><div class="section-hint">Control each playback device independently (Simultaneous Playback)</div></div><button class="link-btn" data-goto="devices">MANAGE DEVICES ↗</button></div>
+    <div class="device-grid" id="deviceGrid"></div>
+    <div class="section-head"><div><div class="section-title">Application Routing</div><div class="section-hint">Active applications currently playing audio</div></div><button class="link-btn" data-goto="routing">VIEW ALL ↗</button></div>
+    <div class="section-panel routing-list" id="dashboardAppList"></div>
+  </section>
+
+  <section class="page" id="page-routing">
+    <div class="modebar"><button class="active" data-mode="apps">Application routing</button><button data-mode="system">System audio</button></div>
+    <div class="section-head" style="margin-top:5px"><div><div class="section-title" id="routingTitle">Application Output Assignment</div><div class="section-hint" id="routingDesc">Assign each application to an audio output</div></div><button class="secondary-btn" id="refreshApps">↻ Refresh apps</button></div>
+    <div class="section-panel routing-list" id="appList"></div>
+    <div class="notice" id="routingNotice">Switch to "System audio" tab above to toggle simultaneous multi-device audio duplication, or assign individual app sessions.</div>
+  </section>
+
+  <section class="page" id="page-devices">
+    <div class="section-head" style="margin-top:0"><div><div class="section-title">Available Audio Devices</div><div class="section-hint">Connected playback devices detected by Windows WASAPI</div></div><button class="primary-btn" id="refreshDevices">↻ Refresh devices</button></div>
+    <div class="section-panel" style="padding:6px 17px;overflow:auto">
+      <table class="device-table"><thead><tr><th>DEVICE</th><th>TYPE</th><th>STATUS</th><th>DEFAULT</th><th>FORMAT</th></tr></thead><tbody id="deviceTableBody"></tbody></table>
+    </div>
+  </section>
+
+  <section class="page" id="page-settings">
+    <div class="settings-grid">
+      <div class="section-panel setting-card"><div class="setting-title">Appearance</div><div class="setting-desc">Choose your preferred interface theme.</div><div class="theme-options"><button class="theme-option selected" data-theme="light">☀ Light</button><button class="theme-option" data-theme="dark">☾ Dark</button></div></div>
+      <div class="section-panel setting-card"><div class="setting-title">Audio Preferences</div><div class="setting-desc">Configure application behavior.</div>
+        <div class="toggle-row"><span>Independent output volume</span><span class="pill">Enabled</span></div>
+        <div class="toggle-row"><span>Start with Windows</span><label class="switch"><input type="checkbox" id="chkStartup"><span></span></label></div>
+        <div class="toggle-row"><span>Minimize to system tray</span><label class="switch"><input type="checkbox" id="chkTray" checked><span></span></label></div>
+        <div class="toggle-row"><span>Start minimized</span><label class="switch"><input type="checkbox" id="chkMin"><span></span></label></div>
+      </div>
+      <div class="section-panel setting-card"><div class="setting-title">Audio Engine</div><div class="setting-desc">Audio processing preferences.</div>
+        <div class="toggle-row"><span>Engine status</span><span class="pill" id="settingsEnginePill">Running (WASAPI)</span></div>
+        <div class="toggle-row"><span>Sample rate</span><b>48,000 Hz</b></div>
+        <div class="toggle-row"><span>Buffer size</span><select class="route-select" id="selBuffer" style="min-width:100px"><option value="256">256 samples (Low Latency)</option><option value="512" selected>512 samples (Balanced)</option><option value="1024">1024 samples (Stable)</option></select></div>
+      </div>
+      <div class="section-panel setting-card"><div class="setting-title">About GafelSound</div><div class="setting-desc">Multi-output simultaneous audio router for Windows.</div><div style="font-size:12px;font-weight:700">GafelSound <span style="color:var(--muted);font-weight:400">Version 1.0 Desktop</span></div><div class="notice">Captures Windows WASAPI loopback stream in real-time and renders simultaneously across multiple enabled audio endpoints with independent software volume scaling.</div></div>
+    </div>
+  </section>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+let state = { devices: [], apps: [], routingMode: 'apps' };
+
+const pages = {
+  dashboard: ["Dashboard", "Manage your audio experience", "OVERVIEW"],
+  routing: ["App Routing", "Choose where each app plays audio", "APPLICATIONS"],
+  devices: ["Devices", "Manage connected sound devices", "HARDWARE"],
+  settings: ["Settings", "Customize your GafelSound experience", "PREFERENCES"]
+};
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window.toastTimer);
+  window.toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.page === name));
+  document.getElementById('pageTitle').textContent = pages[name][0];
+  document.getElementById('pageDesc').textContent = pages[name][1];
+  document.getElementById('crumb').textContent = pages[name][2];
+}
+
+document.querySelectorAll('.nav button').forEach(b => b.addEventListener('click', () => showPage(b.dataset.page)));
+document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => showPage(b.dataset.goto)));
+
+function setTheme(theme, save = true) {
+  document.body.classList.toggle('dark', theme === 'dark');
+  document.querySelectorAll('.theme-option').forEach(b => b.classList.toggle('selected', b.dataset.theme === theme));
+  document.getElementById('themeQuick').textContent = theme === 'dark' ? '☀' : '☾';
+  localStorage.setItem('audioflow-theme', theme);
+  if (save && window.pywebview) window.pywebview.api.update_setting('theme', theme);
+}
+
+document.querySelectorAll('.theme-option').forEach(b => b.addEventListener('click', () => setTheme(b.dataset.theme)));
+document.getElementById('themeQuick').addEventListener('click', () => setTheme(document.body.classList.contains('dark') ? 'light' : 'dark'));
+
+function renderDevices() {
+  const grid = document.getElementById('deviceGrid');
+  const tbody = document.getElementById('deviceTableBody');
+  grid.innerHTML = '';
+  tbody.innerHTML = '';
+
+  document.getElementById('connectedCount').textContent = state.devices.length;
+  document.getElementById('activeCount').textContent = state.devices.filter(d => d.enabled).length;
+
+  state.devices.forEach(dev => {
+    const card = document.createElement('article');
+    card.className = 'card device-card';
+    card.style.opacity = dev.enabled ? '1' : '.58';
+    card.innerHTML = `
+      <div class="device-top">
+        <div class="device-icon">${dev.icon}</div>
+        <div>
+          <div class="device-name">${dev.name}</div>
+          <div class="device-desc">${dev.desc} ${dev.is_default ? '· Default Master' : ''}</div>
+        </div>
+        <div class="spacer"></div>
+        <span class="pill ${dev.enabled ? '' : 'off'}">${dev.enabled ? 'Active' : 'Standby'}</span>
+      </div>
+      <div class="volume-row"><span>Output volume</span><span class="volume-value"><b class="value">${dev.volume}</b>%</span></div>
+      <input type="range" min="0" max="100" value="${dev.volume}" style="--fill:${dev.volume}%">
+      <div class="card-footer">
+        <label class="check-label"><input type="checkbox" class="enable" ${dev.enabled ? 'checked' : ''}> Playback enabled</label>
+        <button class="mute-btn ${dev.muted ? 'active' : ''}">${dev.muted ? '◖ Unmute' : '◖ Mute'}</button>
+      </div>
+    `;
+
+    const slider = card.querySelector('input[type=range]');
+    const valText = card.querySelector('.value');
+    const chk = card.querySelector('.enable');
+    const muteBtn = card.querySelector('.mute-btn');
+
+    slider.addEventListener('input', () => {
+      dev.volume = parseInt(slider.value);
+      slider.style.setProperty('--fill', dev.volume + '%');
+      valText.textContent = dev.volume;
+      if (window.pywebview) window.pywebview.api.set_volume(dev.id, dev.volume);
+    });
+
+    chk.addEventListener('change', () => {
+      dev.enabled = chk.checked;
+      if (window.pywebview) window.pywebview.api.toggle_enable(dev.id, dev.enabled);
+      renderDevices();
+      renderRouting();
+      toast((dev.enabled ? 'Playback enabled: ' : 'Playback disabled: ') + dev.name);
+    });
+
+    muteBtn.addEventListener('click', () => {
+      dev.muted = !dev.muted;
+      if (window.pywebview) window.pywebview.api.toggle_mute(dev.id, dev.muted);
+      renderDevices();
+      toast(dev.muted ? `Muted ${dev.name}` : `Unmuted ${dev.name}`);
+    });
+
+    grid.appendChild(card);
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><b>${dev.name}</b><br><span style="color:var(--muted)">${dev.desc}</span></td>
+      <td>${dev.type}</td>
+      <td><span class="pill">${dev.status}</span></td>
+      <td>${dev.is_default ? 'Yes' : 'No'}</td>
+      <td>${dev.format}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderRouting() {
+  const dashList = document.getElementById('dashboardAppList');
+  const appList = document.getElementById('appList');
+  const optionsHtml = state.devices.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+
+  const appsToRender = state.apps.length ? state.apps : [
+    { name: "System Audio Stream", icon: "🌐", status: "No active app streams detected · Ready" }
+  ];
+
+  dashList.innerHTML = appsToRender.slice(0, 3).map(a => `
+    <div class="route-row">
+      <div class="app-icon">${a.icon}</div>
+      <div><div class="app-name">${a.name}</div><div class="app-meta">${a.status}</div></div>
+      <div class="spacer"></div>
+      <select class="route-select">${optionsHtml}</select>
+    </div>
+  `).join('');
+
+  if (state.routingMode === 'system') {
+    appList.innerHTML = state.devices.map(d => `
+      <div class="route-row">
+        <div class="app-icon">${d.icon}</div>
+        <div><div class="app-name">${d.name}</div><div class="app-meta">Simultaneous audio destination</div></div>
+        <div class="spacer"></div>
+        <label class="check-label"><input type="checkbox" data-devid="${d.id}" ${d.enabled ? 'checked' : ''}> Receive audio</label>
+      </div>
+    `).join('');
+
+    appList.querySelectorAll('input[type=checkbox]').forEach(chk => {
+      chk.addEventListener('change', () => {
+        const id = chk.dataset.devid;
+        const dev = state.devices.find(x => x.id === id);
+        if (dev) {
+          dev.enabled = chk.checked;
+          if (window.pywebview) window.pywebview.api.toggle_enable(id, dev.enabled);
+          renderDevices();
+          toast(`Simultaneous output updated for ${dev.name}`);
+        }
+      });
+    });
+  } else {
+    appList.innerHTML = appsToRender.map(a => `
+      <div class="route-row">
+        <div class="app-icon">${a.icon}</div>
+        <div><div class="app-name">${a.name}</div><div class="app-meta">${a.status}</div></div>
+        <div class="spacer"></div>
+        <select class="route-select">${optionsHtml}</select>
+      </div>
+    `).join('');
+  }
+
+  document.querySelectorAll('.route-select').forEach(s => {
+    if ( s.id !== 'selBuffer' ) {
+      s.onchange = () => toast('Output target updated');
+    }
+  });
+}
+
+document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('[data-mode]').forEach(x => x.classList.toggle('active', x === b));
+  state.routingMode = b.dataset.mode;
+  const system = state.routingMode === 'system';
+  document.getElementById('routingTitle').textContent = system ? 'System Audio Destinations' : 'Application Output Assignment';
+  document.getElementById('routingDesc').textContent = system ? 'Select which devices receive duplicated system audio simultaneously' : 'Assign each application to an audio output';
+  renderRouting();
+}));
+
+document.getElementById('refreshDevices').addEventListener('click', async () => {
+  if (window.pywebview) {
+    state.devices = await window.pywebview.api.refresh_devices();
+    renderDevices();
+    renderRouting();
+  }
+  toast('Audio devices refreshed');
+});
+
+document.getElementById('refreshApps').addEventListener('click', async () => {
+  if (window.pywebview) {
+    state.apps = await window.pywebview.api.refresh_apps();
+    renderRouting();
+  }
+  toast('Active audio applications scanned');
+});
+
+document.getElementById('openWinMixer').addEventListener('click', () => {
+  if (window.pywebview) window.pywebview.api.open_windows_mixer();
+});
+
+document.getElementById('selBuffer').addEventListener('change', (e) => {
+  if (window.pywebview) window.pywebview.api.update_setting('buffer_size', parseInt(e.target.value));
+  toast(`Audio buffer updated to ${e.target.value} samples`);
+});
+
+document.getElementById('chkStartup').addEventListener('change', (e) => {
+  if (window.pywebview) window.pywebview.api.update_setting('start_with_windows', e.target.checked);
+  toast('Startup preference saved');
+});
+
+window.addEventListener('pywebviewready', async () => {
+  const initData = await window.pywebview.api.get_initial_state();
+  state.devices = initData.devices || [];
+  state.apps = initData.apps || [];
+  if (initData.settings) {
+    setTheme(initData.settings.theme || 'light', false);
+    document.getElementById('chkStartup').checked = !!initData.settings.start_with_windows;
+    document.getElementById('selBuffer').value = String(initData.settings.buffer_size || 512);
+  }
+  renderDevices();
+  renderRouting();
+});
+</script>
+</body>
+</html>
