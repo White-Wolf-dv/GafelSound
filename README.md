@@ -24,7 +24,14 @@
 * **Standalone Portable Executable:** Easily packaged into a single `.exe` file with zero external dependencies required for end users.
 
 ---
+## 🖼️ GafelSound Preview
 
+<div align="center">
+  <img src="App.png" alt="GafelSound Preview" width="850" />
+</div>
+
+
+---
 ## 🚀 Quick Start (Standalone `.exe`)
 
 1. Go to the [**Releases**](../../releases) section of this repository.
