@@ -27,7 +27,7 @@
 ## 🖼️ GafelSound Preview
 
 <div align="center">
-  <img src="App.png" alt="GafelSound Preview" width="850" />
+  <img src="App.png" alt="GafelSound Preview" width="550" />
 </div>
 
 
