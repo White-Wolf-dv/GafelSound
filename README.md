@@ -91,6 +91,10 @@ GafelSound/
 └── README.md           # Project documentation
 ```
 
+<div align="center">
+  <img src="https://github.com/White-Wolf-dv/White-Wolf-dv/blob/main/Gif/57.gif" alt="GafelSound Preview" width="550" />
+</div>
+
 ---
 
 ## 📄 License
