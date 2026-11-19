@@ -90,7 +90,9 @@ GafelSound/
 ├── Gafelsound.ico      # Windows executable & window icon (ICO)
 └── README.md           # Project documentation
 ```
+---
 
+<br>
 <div align="center">
   <img src="https://github.com/White-Wolf-dv/White-Wolf-dv/blob/main/Gif/57.gif" alt="GafelSound Preview" width="550" />
 </div>
