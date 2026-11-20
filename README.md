@@ -115,4 +115,4 @@ This project is licensed under the **PolyForm Noncommercial License 1.0.0**, wit
 
 See the [LICENSE](./LICENSE) file for the complete license terms and additional attribution requirements.
 
-© 2026 [YOUR NAME]. All rights reserved.
+© 2026 White-Wolf-dv. All rights reserved.
