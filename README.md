@@ -99,6 +99,20 @@ GafelSound/
 
 ---
 
-## 📄 License
+## 📄 License & Copyright
 
-This project is open-source and available under the [MIT License](LICENSE).
+
+This project is licensed under the **PolyForm Noncommercial License 1.0.0**, with additional attribution requirements.
+
+- Free for personal and non-commercial use.
+- Modification and redistribution are permitted for non-commercial purposes.
+- Commercial use, sale, or monetization is prohibited without prior written permission from the original author.
+- Proper credit to the original author must be preserved in any project using this software or any part of it.
+
+**Original Author:** [White-Wolf-dv]
+
+**Original Repository:** [https://github.com/White-Wolf-dv/GafelSound]
+
+See the [LICENSE](./LICENSE) file for the complete license terms and additional attribution requirements.
+
+© 2026 [YOUR NAME]. All rights reserved.
