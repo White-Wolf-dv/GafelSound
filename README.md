@@ -106,8 +106,7 @@ GafelSound/
 │   ├── MultiAudioEngine.cs # WASAPI loopback & multi-output audio engine
 │   ├── Models.cs           # Data models & settings
 │   ├── ui.html             # Frontend UI
-│   ├── Gafelsound.ico      # Application icon
-│   └── setup.iss           # Inno Setup installer script
+│   └── Gafelsound.ico      # Application icon
 ├── Python/                 # Original Python + PyWebView + PyAudioWPatch edition
 │   ├── app.py              # WASAPI multi-output audio engine & PyWebView backend
 │   ├── ui.html             # Frontend dashboard, routing, devices & settings UI
