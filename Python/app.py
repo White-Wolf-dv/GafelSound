@@ -19,8 +19,8 @@ class MultiAudioEngine:
     def __init__(self):
         self.p = pyaudio.PyAudio()
         self.running = False
-        self.devices = {}  # id -> device metadata & state
-        self.output_streams = {}  # id -> PyAudio stream
+        self.devices = {}  
+        self.output_streams = {} 
         self.lock = threading.Lock()
         self.buffer_size = 512
         self.independent_volume = True
@@ -64,7 +64,6 @@ class MultiAudioEngine:
         return "Speakers", "◖))"
 
     def scan_devices(self):
-        """شناسایی تمام کارت‌های صدای خروجی فعال در ویندوز از طریق WASAPI"""
         with self.lock:
             old_states = {
                 k: {
@@ -153,15 +152,12 @@ class MultiAudioEngine:
         self.output_streams.clear()
 
     def _audio_loop(self):
-        """حلقه اصلی ضبط صدای ویندوز (Loopback) و پخش همزمان در چند خروجی"""
         CoInitialize()
         loopback_stream = None
         try:
             wasapi_info = self.p.get_host_api_info_by_type(pyaudio.paWASAPI)
             default_Index = wasapi_info["defaultOutputDevice"]
             default_speaker = self.p.get_device_info_by_index(default_Index)
-
-            # پیدا کردن Loopback مربوط به خروجی پیش‌فرض ویندوز
             loopback_dev = None
             for loopback in self.p.get_loopback_device_info_generator():
                 if default_speaker["name"] in loopback["name"]:
@@ -199,7 +195,6 @@ class MultiAudioEngine:
 
                 with self.lock:
                     for dev_id, dev in self.devices.items():
-                        # خروجی پیش‌فرض خودش صدا را پخش می‌کند؛ فقط به خروجی‌های کمکیِ فعال ارسال می‌کنیم
                         if dev["is_default"]:
                             continue
 
@@ -227,7 +222,6 @@ class MultiAudioEngine:
                             except Exception:
                                 continue
 
-                        # اعمال حجم صدا و Mute مستقل برای هر خروجی
                         vol_factor = (
                             0.0
                             if dev["muted"]
@@ -235,7 +229,6 @@ class MultiAudioEngine:
                         )
                         processed = audio_chunk * vol_factor
 
-                        # تطبیق تعداد کانال‌ها و نرخ نمونه‌برداری در صورت تفاوت
                         frames = len(processed) // in_ch
                         reshaped = processed.reshape((frames, in_ch))
 
@@ -289,7 +282,6 @@ class MultiAudioEngine:
         with self.lock:
             if dev_id in self.devices:
                 self.devices[dev_id]["volume"] = vol
-                # اگر دستگاه پیش‌فرض است، صدای مستر ویندوز را هم تنظیم کن
                 if self.devices[dev_id]["is_default"]:
                     self._set_windows_default_volume(vol / 100.0, None)
         return True
@@ -330,7 +322,6 @@ class MultiAudioEngine:
             CoUninitialize()
 
     def get_active_audio_apps(self):
-        """دریافت لیست برنامه‌های در حال پخش صدا در ویندوز"""
         apps = []
         seen = set()
         try:
@@ -379,8 +370,6 @@ class MultiAudioEngine:
 
 
 class WebAppAPI:
-    """پل ارتباطی بین رابط گرافیکی جاوااسکریپت و موتور پایتون"""
-
     def __init__(self, engine: MultiAudioEngine):
         self.engine = engine
 
@@ -422,12 +411,10 @@ class WebAppAPI:
         return {"ok": True}
 
     def open_windows_mixer(self):
-        """باز کردن تنظیمات پیشرفته Routing ویندوز در صورت نیاز"""
         os.system("start ms-settings:apps-volume")
         return {"ok": True}
     
 def resource_path(relative_path):
-    """دریافت مسیر دقیق فایل‌ها در حالت اجرا و حالت کامپایل‌شده PyInstaller"""
     if hasattr(sys, '_MEIPASS'):
         return os.path.join(sys._MEIPASS, relative_path)
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), relative_path)
